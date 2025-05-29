@@ -12,8 +12,10 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import * as Clipboard from 'expo-clipboard';
 import { generateMnemonic, createWalletFromMnemonic } from '../utils/cryptoUtils';
+import { useLanguage } from '../utils/LanguageContext';
 
 export default function CreateWalletScreen({ navigation }) {
+  const { t } = useLanguage();
   const [mnemonic, setMnemonic] = useState('');
   const [isCreating, setIsCreating] = useState(false);
   const [step, setStep] = useState(1); // 1: Generate, 2: Show mnemonic, 3: Confirm
@@ -37,11 +39,11 @@ export default function CreateWalletScreen({ navigation }) {
     try {
       await createWalletFromMnemonic(mnemonic);
       Alert.alert(
-        'Wallet Created!',
+        t('walletCreated'),
         'Your wallet has been created successfully.',
         [
           {
-            text: 'OK',
+            text: t('ok'),
             onPress: () => {
               // Navigate back to trigger App.js to recheck wallet existence
               navigation.popToTop();
@@ -50,7 +52,7 @@ export default function CreateWalletScreen({ navigation }) {
         ]
       );
     } catch (error) {
-      Alert.alert('Error', 'Failed to create wallet: ' + error.message);
+      Alert.alert(t('error'), 'Failed to create wallet: ' + error.message);
     } finally {
       setIsCreating(false);
     }
@@ -76,7 +78,7 @@ export default function CreateWalletScreen({ navigation }) {
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Ionicons name="arrow-back" size={24} color="#007AFF" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Create Wallet</Text>
+        <Text style={styles.headerTitle}>{t('createWallet')}</Text>
         <View style={{ width: 24 }} />
       </View>
 
@@ -85,9 +87,9 @@ export default function CreateWalletScreen({ navigation }) {
           <Text style={styles.stepText}>Step 1 of 1</Text>
         </View>
 
-        <Text style={styles.title}>Your Recovery Phrase</Text>
+        <Text style={styles.title}>{t('yourSeedPhrase')}</Text>
         <Text style={styles.subtitle}>
-          Write down these 12 words in order and keep them safe. You'll need them to restore your wallet.
+          {t('writeDownSeedPhrase')}
         </Text>
 
         {renderMnemonicWords()}
@@ -101,12 +103,12 @@ export default function CreateWalletScreen({ navigation }) {
 
         <TouchableOpacity style={styles.copyButton} onPress={copyToClipboard}>
           <Ionicons name="copy-outline" size={20} color="#007AFF" />
-          <Text style={styles.copyButtonText}>Copy to Clipboard</Text>
+          <Text style={styles.copyButtonText}>{t('copyAddress')}</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.regenerateButton} onPress={generateNewMnemonic}>
           <Ionicons name="refresh-outline" size={20} color="#666" />
-          <Text style={styles.regenerateButtonText}>Generate New Phrase</Text>
+          <Text style={styles.regenerateButtonText}>{t('generateSeedPhrase')}</Text>
         </TouchableOpacity>
       </ScrollView>
 
@@ -119,7 +121,7 @@ export default function CreateWalletScreen({ navigation }) {
           {isCreating ? (
             <ActivityIndicator color="white" />
           ) : (
-            <Text style={styles.createButtonText}>Create Wallet</Text>
+            <Text style={styles.createButtonText}>{t('createWallet')}</Text>
           )}
         </TouchableOpacity>
       </View>

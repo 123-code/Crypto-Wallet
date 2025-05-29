@@ -16,8 +16,10 @@ import {
   getBitcoinBalance,
   getEthereumBalance,
 } from '../utils/cryptoUtils';
+import { useLanguage } from '../utils/LanguageContext';
 
 export default function WalletScreen({ navigation }) {
+  const { t } = useLanguage();
   const [addresses, setAddresses] = useState({ bitcoin: '', ethereum: '' });
   const [balances, setBalances] = useState({ bitcoin: '0', ethereum: '0' });
   const [isLoading, setIsLoading] = useState(true);
@@ -40,7 +42,7 @@ export default function WalletScreen({ navigation }) {
       });
     } catch (error) {
       console.error('Error loading wallet data:', error);
-      Alert.alert('Error', 'Failed to load wallet data');
+      Alert.alert(t('error'), t('failedToLoadWallet'));
     } finally {
       setIsLoading(false);
       setRefreshing(false);
@@ -86,7 +88,7 @@ export default function WalletScreen({ navigation }) {
       </View>
       
       <View style={styles.addressSection}>
-        <Text style={styles.addressLabel}>Address:</Text>
+        <Text style={styles.addressLabel}>{t('address')}</Text>
         <TouchableOpacity style={styles.addressContainer}>
           <Text style={styles.addressText}>{formatAddress(address)}</Text>
           <Ionicons name="copy-outline" size={16} color="#007AFF" />
@@ -99,7 +101,7 @@ export default function WalletScreen({ navigation }) {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
-          <Text>Loading wallet...</Text>
+          <Text>{t('loadingWallet')}</Text>
         </View>
       </SafeAreaView>
     );
@@ -108,7 +110,7 @@ export default function WalletScreen({ navigation }) {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>My Wallet</Text>
+        <Text style={styles.headerTitle}>{t('myWallet')}</Text>
         <TouchableOpacity style={styles.settingsButton}>
           <Ionicons name="settings-outline" size={24} color="#666" />
         </TouchableOpacity>
@@ -121,7 +123,7 @@ export default function WalletScreen({ navigation }) {
         }
       >
         <View style={styles.totalBalanceCard}>
-          <Text style={styles.totalBalanceLabel}>Total Balance</Text>
+          <Text style={styles.totalBalanceLabel}>{t('totalBalance')}</Text>
           <Text style={styles.totalBalanceAmount}>$0.00</Text>
           <Text style={styles.totalBalanceSubtext}>USD</Text>
         </View>
@@ -134,7 +136,7 @@ export default function WalletScreen({ navigation }) {
             <View style={[styles.actionIcon, { backgroundColor: '#FF6B6B20' }]}>
               <Ionicons name="arrow-up" size={24} color="#FF6B6B" />
             </View>
-            <Text style={styles.actionText}>Send</Text>
+            <Text style={styles.actionText}>{t('send')}</Text>
           </TouchableOpacity>
           
           <TouchableOpacity 
@@ -144,26 +146,26 @@ export default function WalletScreen({ navigation }) {
             <View style={[styles.actionIcon, { backgroundColor: '#4ECDC420' }]}>
               <Ionicons name="arrow-down" size={24} color="#4ECDC4" />
             </View>
-            <Text style={styles.actionText}>Receive</Text>
+            <Text style={styles.actionText}>{t('receive')}</Text>
           </TouchableOpacity>
           
           <TouchableOpacity style={styles.actionButton}>
             <View style={[styles.actionIcon, { backgroundColor: '#45B7D120' }]}>
               <Ionicons name="swap-horizontal" size={24} color="#45B7D1" />
             </View>
-            <Text style={styles.actionText}>Swap</Text>
+            <Text style={styles.actionText}>{t('swap')}</Text>
           </TouchableOpacity>
           
           <TouchableOpacity style={styles.actionButton}>
             <View style={[styles.actionIcon, { backgroundColor: '#96CEB420' }]}>
               <Ionicons name="card" size={24} color="#96CEB4" />
             </View>
-            <Text style={styles.actionText}>Buy</Text>
+            <Text style={styles.actionText}>{t('buy')}</Text>
           </TouchableOpacity>
         </View>
 
         <View style={styles.assetsSection}>
-          <Text style={styles.sectionTitle}>Assets</Text>
+          <Text style={styles.sectionTitle}>{t('assets')}</Text>
           
           <CryptoCard
             name="Bitcoin"

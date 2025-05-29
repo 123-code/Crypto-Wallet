@@ -12,8 +12,10 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { sendBitcoinTransaction, sendEthereumTransaction } from '../utils/cryptoUtils';
+import { useLanguage } from '../utils/LanguageContext';
 
 export default function SendScreen({ navigation }) {
+  const { t } = useLanguage();
   const [selectedCrypto, setSelectedCrypto] = useState('BTC');
   const [recipient, setRecipient] = useState('');
   const [amount, setAmount] = useState('');
@@ -26,12 +28,12 @@ export default function SendScreen({ navigation }) {
 
   const sendTransaction = async () => {
     if (!recipient.trim()) {
-      Alert.alert('Error', 'Please enter a recipient address');
+      Alert.alert(t('error'), t('enterRecipientAddress'));
       return;
     }
 
     if (!amount || parseFloat(amount) <= 0) {
-      Alert.alert('Error', 'Please enter a valid amount');
+      Alert.alert(t('error'), t('enterAmount'));
       return;
     }
 
@@ -49,7 +51,7 @@ export default function SendScreen({ navigation }) {
         `Your ${selectedCrypto} transaction has been sent.\n\nTransaction Hash: ${txHash}`,
         [
           {
-            text: 'OK',
+            text: t('ok'),
             onPress: () => {
               setRecipient('');
               setAmount('');
@@ -59,7 +61,7 @@ export default function SendScreen({ navigation }) {
         ]
       );
     } catch (error) {
-      Alert.alert('Error', 'Failed to send transaction: ' + error.message);
+      Alert.alert(t('error'), t('failedToSend') + ': ' + error.message);
     } finally {
       setIsSending(false);
     }
@@ -84,7 +86,7 @@ export default function SendScreen({ navigation }) {
 
   const CryptoSelector = () => (
     <View style={styles.cryptoSelector}>
-      <Text style={styles.sectionTitle}>Select Cryptocurrency</Text>
+      <Text style={styles.sectionTitle}>{t('selectCurrency')}</Text>
       <View style={styles.cryptoOptions}>
         {cryptoOptions.map((crypto) => (
           <TouchableOpacity
@@ -114,14 +116,14 @@ export default function SendScreen({ navigation }) {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Send</Text>
+        <Text style={styles.headerTitle}>{t('send')}</Text>
       </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         <CryptoSelector />
 
         <View style={styles.formSection}>
-          <Text style={styles.sectionTitle}>Recipient Address</Text>
+          <Text style={styles.sectionTitle}>{t('recipientAddress')}</Text>
           <View style={styles.inputContainer}>
             <TextInput
               style={styles.textInput}
@@ -135,18 +137,18 @@ export default function SendScreen({ navigation }) {
             <View style={styles.inputActions}>
               <TouchableOpacity style={styles.inputAction} onPress={pasteFromClipboard}>
                 <Ionicons name="clipboard-outline" size={16} color="#007AFF" />
-                <Text style={styles.inputActionText}>Paste</Text>
+                <Text style={styles.inputActionText}>{t('paste')}</Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.inputAction} onPress={openQRScanner}>
                 <Ionicons name="qr-code-outline" size={16} color="#007AFF" />
-                <Text style={styles.inputActionText}>Scan</Text>
+                <Text style={styles.inputActionText}>{t('scanQR')}</Text>
               </TouchableOpacity>
             </View>
           </View>
         </View>
 
         <View style={styles.formSection}>
-          <Text style={styles.sectionTitle}>Amount</Text>
+          <Text style={styles.sectionTitle}>{t('amount')}</Text>
           <View style={styles.amountContainer}>
             <TextInput
               style={styles.amountInput}
@@ -164,11 +166,11 @@ export default function SendScreen({ navigation }) {
 
         <View style={styles.feeSection}>
           <View style={styles.feeRow}>
-            <Text style={styles.feeLabel}>Network Fee</Text>
+            <Text style={styles.feeLabel}>{t('networkFee')}</Text>
             <Text style={styles.feeValue}>~0.001 {selectedCrypto}</Text>
           </View>
           <View style={styles.feeRow}>
-            <Text style={styles.feeLabel}>Total</Text>
+            <Text style={styles.feeLabel}>{t('total')}</Text>
             <Text style={styles.feeValueTotal}>
               {amount ? (parseFloat(amount) + 0.001).toFixed(6) : '0.001'} {selectedCrypto}
             </Text>
@@ -192,7 +194,7 @@ export default function SendScreen({ navigation }) {
           {isSending ? (
             <ActivityIndicator color="white" />
           ) : (
-            <Text style={styles.sendButtonText}>Send {selectedCrypto}</Text>
+            <Text style={styles.sendButtonText}>{t('sendTransaction')}</Text>
           )}
         </TouchableOpacity>
       </View>

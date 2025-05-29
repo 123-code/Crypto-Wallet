@@ -12,8 +12,10 @@ import { Ionicons } from '@expo/vector-icons';
 import QRCode from 'react-native-qrcode-svg';
 import * as Clipboard from 'expo-clipboard';
 import { getWalletAddresses } from '../utils/cryptoUtils';
+import { useLanguage } from '../utils/LanguageContext';
 
 export default function ReceiveScreen({ navigation }) {
+  const { t } = useLanguage();
   const [selectedCrypto, setSelectedCrypto] = useState('BTC');
   const [addresses, setAddresses] = useState({ bitcoin: '', ethereum: '' });
 
@@ -32,7 +34,7 @@ export default function ReceiveScreen({ navigation }) {
       setAddresses(walletAddresses);
     } catch (error) {
       console.error('Error loading addresses:', error);
-      Alert.alert('Error', 'Failed to load wallet addresses');
+      Alert.alert(t('error'), 'Failed to load wallet addresses');
     }
   };
 
@@ -44,18 +46,18 @@ export default function ReceiveScreen({ navigation }) {
     const address = getCurrentAddress();
     if (address) {
       await Clipboard.setStringAsync(address);
-      Alert.alert('Copied!', `${selectedCrypto} address copied to clipboard`);
+      Alert.alert('Copied!', t('addressCopied'));
     }
   };
 
   const shareAddress = () => {
     const address = getCurrentAddress();
-    Alert.alert('Share Address', `${selectedCrypto} Address:\n\n${address}`);
+    Alert.alert(t('shareAddress'), `${selectedCrypto} ${t('address')}\n\n${address}`);
   };
 
   const CryptoSelector = () => (
     <View style={styles.cryptoSelector}>
-      <Text style={styles.sectionTitle}>Select Cryptocurrency</Text>
+      <Text style={styles.sectionTitle}>{t('selectCurrency')}</Text>
       <View style={styles.cryptoOptions}>
         {cryptoOptions.map((crypto) => (
           <TouchableOpacity
@@ -85,14 +87,14 @@ export default function ReceiveScreen({ navigation }) {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Receive</Text>
+        <Text style={styles.headerTitle}>{t('receive')}</Text>
       </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         <CryptoSelector />
 
         <View style={styles.qrSection}>
-          <Text style={styles.sectionTitle}>Your {selectedCrypto} Address</Text>
+          <Text style={styles.sectionTitle}>{t('yourAddress')} {selectedCrypto}</Text>
           
           <View style={styles.qrContainer}>
             {getCurrentAddress() ? (
@@ -105,25 +107,25 @@ export default function ReceiveScreen({ navigation }) {
             ) : (
               <View style={styles.qrPlaceholder}>
                 <Ionicons name="qr-code" size={80} color="#CCC" />
-                <Text style={styles.qrPlaceholderText}>Loading...</Text>
+                <Text style={styles.qrPlaceholderText}>{t('loading')}</Text>
               </View>
             )}
           </View>
 
           <View style={styles.addressContainer}>
-            <Text style={styles.addressLabel}>Address:</Text>
+            <Text style={styles.addressLabel}>{t('address')}</Text>
             <Text style={styles.addressText}>{getCurrentAddress()}</Text>
           </View>
 
           <View style={styles.actionButtons}>
             <TouchableOpacity style={styles.actionButton} onPress={copyToClipboard}>
               <Ionicons name="copy-outline" size={20} color="#007AFF" />
-              <Text style={styles.actionButtonText}>Copy</Text>
+              <Text style={styles.actionButtonText}>{t('copyAddress')}</Text>
             </TouchableOpacity>
             
             <TouchableOpacity style={styles.actionButton} onPress={shareAddress}>
               <Ionicons name="share-outline" size={20} color="#007AFF" />
-              <Text style={styles.actionButtonText}>Share</Text>
+              <Text style={styles.actionButtonText}>{t('shareAddress')}</Text>
             </TouchableOpacity>
           </View>
         </View>

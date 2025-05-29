@@ -16,10 +16,15 @@ import CreateWalletScreen from './src/screens/CreateWalletScreen';
 import ImportWalletScreen from './src/screens/ImportWalletScreen';
 import WelcomeScreen from './src/screens/WelcomeScreen';
 
+// Import language context
+import { LanguageProvider, useLanguage } from './src/utils/LanguageContext';
+
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
 function MainTabs() {
+  const { t } = useLanguage();
+  
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -43,17 +48,34 @@ function MainTabs() {
         headerShown: false,
       })}
     >
-      <Tab.Screen name="Wallet" component={WalletScreen} />
-      <Tab.Screen name="Send" component={SendScreen} />
-      <Tab.Screen name="Receive" component={ReceiveScreen} />
-      <Tab.Screen name="Settings" component={SettingsScreen} />
+      <Tab.Screen 
+        name="Wallet" 
+        component={WalletScreen} 
+        options={{ tabBarLabel: t('wallet') }}
+      />
+      <Tab.Screen 
+        name="Send" 
+        component={SendScreen} 
+        options={{ tabBarLabel: t('send') }}
+      />
+      <Tab.Screen 
+        name="Receive" 
+        component={ReceiveScreen} 
+        options={{ tabBarLabel: t('receive') }}
+      />
+      <Tab.Screen 
+        name="Settings" 
+        component={SettingsScreen} 
+        options={{ tabBarLabel: t('settings') }}
+      />
     </Tab.Navigator>
   );
 }
 
-export default function App() {
+function AppContent() {
   const [hasWallet, setHasWallet] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const { isLoading: languageLoading } = useLanguage();
 
   useEffect(() => {
     checkWalletExists();
@@ -71,7 +93,7 @@ export default function App() {
     }
   };
 
-  if (isLoading) {
+  if (isLoading || languageLoading) {
     return null; // Or a loading screen
   }
 
@@ -90,5 +112,13 @@ export default function App() {
         )}
       </Stack.Navigator>
     </NavigationContainer>
+  );
+}
+
+export default function App() {
+  return (
+    <LanguageProvider>
+      <AppContent />
+    </LanguageProvider>
   );
 } 

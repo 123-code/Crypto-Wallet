@@ -8,39 +8,44 @@ import {
   Alert,
   ScrollView,
   Switch,
+  Modal,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { deleteWallet, getMnemonic } from '../utils/cryptoUtils';
 import * as Clipboard from 'expo-clipboard';
+import { useLanguage } from '../utils/LanguageContext';
+import { getAvailableLanguages } from '../utils/i18n';
 
 export default function SettingsScreen({ navigation }) {
+  const { t, language, changeLanguage } = useLanguage();
   const [biometricEnabled, setBiometricEnabled] = useState(false);
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+  const [languageModalVisible, setLanguageModalVisible] = useState(false);
 
   const showRecoveryPhrase = async () => {
     Alert.alert(
-      'Show Recovery Phrase',
+      t('viewSeedPhrase'),
       'Your recovery phrase is sensitive information. Make sure no one is watching your screen.',
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: t('cancel'), style: 'cancel' },
         {
           text: 'Show',
           onPress: async () => {
             try {
               const mnemonic = await getMnemonic();
               Alert.alert(
-                'Recovery Phrase',
+                t('yourSeedPhrase'),
                 mnemonic,
                 [
-                  { text: 'Cancel', style: 'cancel' },
+                  { text: t('cancel'), style: 'cancel' },
                   {
-                    text: 'Copy',
+                    text: t('copyAddress'),
                     onPress: () => Clipboard.setStringAsync(mnemonic),
                   },
                 ]
               );
             } catch (error) {
-              Alert.alert('Error', 'Failed to retrieve recovery phrase');
+              Alert.alert(t('error'), 'Failed to retrieve recovery phrase');
             }
           },
         },
@@ -53,7 +58,7 @@ export default function SettingsScreen({ navigation }) {
       'Reset Wallet',
       'This will permanently delete your wallet from this device. Make sure you have your recovery phrase saved.',
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: t('cancel'), style: 'cancel' },
         {
           text: 'Reset',
           style: 'destructive',
@@ -62,7 +67,7 @@ export default function SettingsScreen({ navigation }) {
               await deleteWallet();
               Alert.alert('Wallet Reset', 'Your wallet has been reset.', [
                 {
-                  text: 'OK',
+                  text: t('ok'),
                   onPress: () => {
                     // This would restart the app navigation
                     navigation.reset({
@@ -73,11 +78,69 @@ export default function SettingsScreen({ navigation }) {
                 },
               ]);
             } catch (error) {
-              Alert.alert('Error', 'Failed to reset wallet');
+              Alert.alert(t('error'), 'Failed to reset wallet');
             }
           },
         },
       ]
+    );
+  };
+
+  const selectLanguage = (langCode) => {
+    changeLanguage(langCode);
+    setLanguageModalVisible(false);
+  };
+
+  const getCurrentLanguageName = () => {
+    const languages = getAvailableLanguages();
+    return languages.find(lang => lang.code === language)?.nativeName || 'English';
+  };
+
+  const LanguageModal = () => {
+    const languages = getAvailableLanguages();
+    
+    return (
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={languageModalVisible}
+        onRequestClose={() => setLanguageModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>{t('language')}</Text>
+              <TouchableOpacity
+                onPress={() => setLanguageModalVisible(false)}
+                style={styles.modalCloseButton}
+              >
+                <Ionicons name="close" size={24} color="#666" />
+              </TouchableOpacity>
+            </View>
+            
+            {languages.map((lang) => (
+              <TouchableOpacity
+                key={lang.code}
+                style={[
+                  styles.languageOption,
+                  language === lang.code && styles.selectedLanguageOption
+                ]}
+                onPress={() => selectLanguage(lang.code)}
+              >
+                <Text style={[
+                  styles.languageOptionText,
+                  language === lang.code && styles.selectedLanguageOptionText
+                ]}>
+                  {lang.nativeName}
+                </Text>
+                {language === lang.code && (
+                  <Ionicons name="checkmark" size={20} color="#007AFF" />
+                )}
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+      </Modal>
     );
   };
 
@@ -108,14 +171,14 @@ export default function SettingsScreen({ navigation }) {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Settings</Text>
+        <Text style={styles.headerTitle}>{t('settings')}</Text>
       </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        <SettingSection title="Security">
+        <SettingSection title={t('security')}>
           <SettingItem
             icon="finger-print"
-            title="Biometric Authentication"
+            title={t('biometricAuth')}
             subtitle="Use fingerprint or Face ID to unlock"
             rightComponent={
               <Switch
@@ -129,14 +192,24 @@ export default function SettingsScreen({ navigation }) {
           
           <SettingItem
             icon="key"
-            title="Show Recovery Phrase"
+            title={t('viewSeedPhrase')}
             subtitle="View your 12-word backup phrase"
             onPress={showRecoveryPhrase}
             color="#FF9500"
           />
         </SettingSection>
 
-        <SettingSection title="Notifications">
+        <SettingSection title={t('general')}>
+          <SettingItem
+            icon="language"
+            title={t('language')}
+            subtitle={getCurrentLanguageName()}
+            onPress={() => setLanguageModalVisible(true)}
+            color="#5856D6"
+          />
+        </SettingSection>
+
+        <SettingSection title={t('notifications')}>
           <SettingItem
             icon="notifications"
             title="Transaction Notifications"
@@ -152,10 +225,10 @@ export default function SettingsScreen({ navigation }) {
           />
         </SettingSection>
 
-        <SettingSection title="About">
+        <SettingSection title={t('about')}>
           <SettingItem
             icon="information-circle"
-            title="App Version"
+            title={t('version')}
             subtitle="1.0.0"
             onPress={() => {}}
             rightComponent={<Text style={styles.versionText}>1.0.0</Text>}
@@ -163,20 +236,20 @@ export default function SettingsScreen({ navigation }) {
           
           <SettingItem
             icon="help-circle"
-            title="Help & Support"
+            title={t('support')}
             subtitle="Get help with using the app"
-            onPress={() => Alert.alert('Help', 'Help documentation would be available here')}
+            onPress={() => Alert.alert(t('support'), 'Help documentation would be available here')}
           />
           
           <SettingItem
             icon="document-text"
-            title="Terms of Service"
+            title={t('termsOfService')}
             onPress={() => Alert.alert('Terms', 'Terms of service would be displayed here')}
           />
           
           <SettingItem
             icon="shield-checkmark"
-            title="Privacy Policy"
+            title={t('privacyPolicy')}
             onPress={() => Alert.alert('Privacy', 'Privacy policy would be displayed here')}
           />
         </SettingSection>
@@ -198,14 +271,9 @@ export default function SettingsScreen({ navigation }) {
             color="#FF3B30"
           />
         </SettingSection>
-
-        <View style={styles.footer}>
-          <Text style={styles.footerText}>
-            Crypto Wallet v1.0.0{'\n'}
-            Built with React Native & Expo
-          </Text>
-        </View>
       </ScrollView>
+
+      <LanguageModal />
     </SafeAreaView>
   );
 }
@@ -226,35 +294,33 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     color: '#333',
-    textAlign: 'center',
   },
   content: {
     flex: 1,
   },
   settingSection: {
-    marginTop: 32,
+    marginTop: 24,
   },
   sectionTitle: {
     fontSize: 16,
     fontWeight: '600',
     color: '#666',
+    marginLeft: 20,
     marginBottom: 8,
-    marginHorizontal: 20,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
   sectionContent: {
     backgroundColor: 'white',
-    marginHorizontal: 20,
     borderRadius: 12,
+    marginHorizontal: 20,
     overflow: 'hidden',
   },
   settingItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
     paddingVertical: 16,
+    paddingHorizontal: 16,
     borderBottomWidth: 1,
     borderBottomColor: '#F0F0F0',
   },
@@ -264,9 +330,9 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   settingIcon: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    width: 32,
+    height: 32,
+    borderRadius: 8,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
@@ -285,22 +351,59 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   settingRight: {
-    marginLeft: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   versionText: {
-    fontSize: 14,
+    fontSize: 16,
     color: '#666',
-    fontWeight: '500',
   },
-  footer: {
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
     alignItems: 'center',
-    paddingVertical: 32,
-    paddingHorizontal: 20,
   },
-  footerText: {
-    fontSize: 14,
-    color: '#999',
-    textAlign: 'center',
-    lineHeight: 20,
+  modalContent: {
+    backgroundColor: 'white',
+    borderRadius: 16,
+    width: '80%',
+    maxWidth: 300,
+    overflow: 'hidden',
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E5E5',
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#333',
+  },
+  modalCloseButton: {
+    padding: 4,
+  },
+  languageOption: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F0F0F0',
+  },
+  selectedLanguageOption: {
+    backgroundColor: '#F0F8FF',
+  },
+  languageOptionText: {
+    fontSize: 16,
+    color: '#333',
+  },
+  selectedLanguageOptionText: {
+    color: '#007AFF',
+    fontWeight: '500',
   },
 }); 

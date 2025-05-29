@@ -7,16 +7,19 @@ import {
   SafeAreaView,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useLanguage } from '../utils/LanguageContext';
 
 export default function WelcomeScreen({ navigation }) {
+  const { t } = useLanguage();
+  
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
         <View style={styles.header}>
           <Ionicons name="wallet" size={80} color="#007AFF" />
-          <Text style={styles.title}>Crypto Wallet</Text>
+          <Text style={styles.title}>{t('appTitle')}</Text>
           <Text style={styles.subtitle}>
-            Secure Bitcoin & Ethereum wallet
+            {t('appSubtitle')}
           </Text>
         </View>
 
@@ -25,20 +28,20 @@ export default function WelcomeScreen({ navigation }) {
             style={styles.primaryButton}
             onPress={() => navigation.navigate('CreateWallet')}
           >
-            <Text style={styles.primaryButtonText}>Create New Wallet</Text>
+            <Text style={styles.primaryButtonText}>{t('createNewWallet')}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={styles.secondaryButton}
             onPress={() => navigation.navigate('ImportWallet')}
           >
-            <Text style={styles.secondaryButtonText}>Import Existing Wallet</Text>
+            <Text style={styles.secondaryButtonText}>{t('importExistingWallet')}</Text>
           </TouchableOpacity>
         </View>
 
         <View style={styles.footer}>
           <Text style={styles.footerText}>
-            Your keys, your crypto. We don't store your private keys.
+            {t('securityMessage')}
           </Text>
         </View>
       </View>

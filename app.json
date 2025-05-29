@@ -16,17 +16,22 @@
         "backgroundColor": "#ffffff"
       }
     },
-    "web": {
-    },
+    "web": {},
     "plugins": [
       "expo-camera",
       "expo-barcode-scanner",
-      "expo-local-authentication"
+      "expo-local-authentication",
+      "expo-localization"
     ],
     "metro": {
       "source": {
-        "include": ["**/*.js", "**/*.json", "**/*.ts", "**/*.tsx"]
+        "include": [
+          "**/*.js",
+          "**/*.json",
+          "**/*.ts",
+          "**/*.tsx"
+        ]
       }
     }
   }
-} 
+}

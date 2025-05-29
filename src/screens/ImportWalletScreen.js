@@ -12,21 +12,23 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { validateMnemonic, createWalletFromMnemonic } from '../utils/cryptoUtils';
+import { useLanguage } from '../utils/LanguageContext';
 
 export default function ImportWalletScreen({ navigation }) {
+  const { t } = useLanguage();
   const [mnemonic, setMnemonic] = useState('');
   const [isImporting, setIsImporting] = useState(false);
 
   const importWallet = async () => {
     if (!mnemonic.trim()) {
-      Alert.alert('Error', 'Please enter your recovery phrase');
+      Alert.alert(t('error'), t('enterSeedPhrase'));
       return;
     }
 
     const cleanedMnemonic = mnemonic.trim().toLowerCase();
     
     if (!validateMnemonic(cleanedMnemonic)) {
-      Alert.alert('Error', 'Invalid recovery phrase. Please check and try again.');
+      Alert.alert(t('error'), t('invalidSeedPhrase'));
       return;
     }
 
@@ -34,11 +36,11 @@ export default function ImportWalletScreen({ navigation }) {
     try {
       await createWalletFromMnemonic(cleanedMnemonic);
       Alert.alert(
-        'Wallet Imported!',
+        t('walletCreated'),
         'Your wallet has been imported successfully.',
         [
           {
-            text: 'OK',
+            text: t('ok'),
             onPress: () => {
               // Navigate back to trigger App.js to recheck wallet existence
               navigation.popToTop();
@@ -47,7 +49,7 @@ export default function ImportWalletScreen({ navigation }) {
         ]
       );
     } catch (error) {
-      Alert.alert('Error', 'Failed to import wallet: ' + error.message);
+      Alert.alert(t('error'), 'Failed to import wallet: ' + error.message);
     } finally {
       setIsImporting(false);
     }
@@ -71,23 +73,23 @@ export default function ImportWalletScreen({ navigation }) {
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Ionicons name="arrow-back" size={24} color="#007AFF" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Import Wallet</Text>
+        <Text style={styles.headerTitle}>{t('importWallet')}</Text>
         <View style={{ width: 24 }} />
       </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        <Text style={styles.title}>Import Your Wallet</Text>
+        <Text style={styles.title}>{t('importWallet')}</Text>
         <Text style={styles.subtitle}>
-          Enter your 12-word recovery phrase to restore your wallet.
+          {t('enterSeedPhrase')}
         </Text>
 
         <View style={styles.inputContainer}>
-          <Text style={styles.inputLabel}>Recovery Phrase</Text>
+          <Text style={styles.inputLabel}>{t('yourSeedPhrase')}</Text>
           <TextInput
             style={styles.textInput}
             multiline
             numberOfLines={4}
-            placeholder="Enter your 12-word recovery phrase separated by spaces"
+            placeholder={t('seedPhrasePlaceholder')}
             value={mnemonic}
             onChangeText={setMnemonic}
             autoCapitalize="none"
@@ -100,7 +102,7 @@ export default function ImportWalletScreen({ navigation }) {
             onPress={pasteFromClipboard}
           >
             <Ionicons name="clipboard-outline" size={16} color="#007AFF" />
-            <Text style={styles.pasteButtonText}>Paste</Text>
+            <Text style={styles.pasteButtonText}>{t('paste')}</Text>
           </TouchableOpacity>
         </View>
 
@@ -128,7 +130,7 @@ export default function ImportWalletScreen({ navigation }) {
           {isImporting ? (
             <ActivityIndicator color="white" />
           ) : (
-            <Text style={styles.importButtonText}>Import Wallet</Text>
+            <Text style={styles.importButtonText}>{t('importButton')}</Text>
           )}
         </TouchableOpacity>
       </View>
