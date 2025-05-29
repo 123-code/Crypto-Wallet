@@ -1,0 +1,32 @@
+{
+  "expo": {
+    "name": "Crypto Wallet",
+    "slug": "crypto-wallet",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#ffffff"
+      }
+    },
+    "web": {
+    },
+    "plugins": [
+      "expo-camera",
+      "expo-barcode-scanner",
+      "expo-local-authentication"
+    ],
+    "metro": {
+      "source": {
+        "include": ["**/*.js", "**/*.json", "**/*.ts", "**/*.tsx"]
+      }
+    }
+  }
+} 
